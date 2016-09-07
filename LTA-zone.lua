@@ -26,7 +26,7 @@ watcher:RegisterEvent("ZONE_CHANGED")
 watcher:RegisterEvent("ZONE_CHANGED_INDOORS")
 watcher:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
-function Zone:HandleZoneChange(...)
+function Zone:HandleZoneChange(event, ...)
   LTA:Debug("Zone Change: " .. event .. " arg type " .. type(...))
 end
 

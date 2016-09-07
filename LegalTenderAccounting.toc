@@ -6,3 +6,4 @@
 
 LTA-init.lua
 LTA-cli.lua
+LTA-zone.lua
