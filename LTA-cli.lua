@@ -1,10 +1,15 @@
 LTA:Debug("Initializing CLI")
 
+LTA.CLI={}
+
+local CLI=LTA.CLI
+
 SLASH_LTA1 = '/lta';
 
-local function CLI_Handler (msg)
+function CLI:Handler (msg)
+  LTA:Debug("Processing cli message")
   print("your command was " .. msg)
 end
 
-SlashCmdList["LTA"] = CLI_Handler
+SlashCmdList["LTA"] = CLI:Handler
 
