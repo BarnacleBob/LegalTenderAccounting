@@ -2,9 +2,9 @@ LTA:Debug("Initializing CLI")
 
 SLASH_LTA1 = '/lta';
 
-function LTA:CLI_Handler(msg, editbox)
-  print("your command was " .. msg .. " in " .. editbox)
+local function CLI_Handler (msg)
+  print("your command was " .. msg)
 end
 
-SlashCmdList["LTA"] = LTA.CLI_Handler
+SlashCmdList["LTA"] = CLI_Handler
 
