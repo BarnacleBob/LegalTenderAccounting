@@ -20,4 +20,19 @@ function LTA:DumpVarArgs(name, ...)
   end
 end
 
-LTA:Info("Initializing")          
+function LTA:CopyTable(orig)
+  --shallow copy a table 
+  local copy
+  copy = {}
+  for orig_key, orig_value in pairs(orig) do
+    copy[orig_key] = orig_value
+  end
+  return copy
+end
+
+function LTA:DumpTable(name, t)
+  LTA:Debug("dumping table: " .. name)
+  for key, value in pairs(t) do
+    LTA:Debug(tostring(key) .. ": " .. tostring(value))
+  end
+end
