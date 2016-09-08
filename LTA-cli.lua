@@ -41,6 +41,4 @@ function CLI:Handler (msg)
   end
 end
 
-
-
 SlashCmdList["LTA"] = function(...) CLI:Handler(...) end
