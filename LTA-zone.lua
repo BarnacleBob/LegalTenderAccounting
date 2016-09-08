@@ -1,5 +1,6 @@
 -- Helper functions to watch for zone changes
 LTA:Debug("Initializing Zone Watcher")
+
 LTA.Zone = {}
 
 local Zone = LTA.Zone
@@ -26,8 +27,16 @@ watcher:RegisterEvent("ZONE_CHANGED")
 watcher:RegisterEvent("ZONE_CHANGED_INDOORS")
 watcher:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
-function Zone:HandleZoneChange(event, ...)
-  LTA:Debug("Zone Change: " .. event .. " arg type " .. type(...))
+function Zone:HandleZoneChange(self, event, ...)
+  LTA:Debug("Handling Zone Change")
+  LTA:Debug("Event type: " .. tostring(event))
+  local x, y, _, map = UnitPosition("player")
+  self.Id = map
+  self.Name = GetRealZoneText(map)
+  SetMapToCurrentZone()
+  self.LocalId = GetCurrentMapAreaID()
+  self.LocalName = GetZoneText()
+  LTA:Debug(("Now in %u (%s) with local %u (%s)"):format(self.Id, self.Name, self.LocalId, self.LocalName))
 end
 
-watcher:SetScript("OnEvent", Zone.HandleZoneChange)
+watcher:SetScript("OnEvent", function(...) Zone:HandleZoneChange(...) end)
