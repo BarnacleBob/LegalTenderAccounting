@@ -1,7 +1,4 @@
-LTA:Debug("Initializing CLI")
-
 LTA.CLI={}
-
 local CLI=LTA.CLI
 
 SLASH_LTA1 = '/lta';
@@ -18,22 +15,35 @@ CLI.Handlers["debug"] = function (args)
   end
 end
 
+CLI.Handlers["guild"] = function()
+  LTA.Guild:GetOnlineMembers()
+end
+
+CLI.Handlers["group"] = function()
+  LTA:DumpTable("Group Members", LTA.Group.Members)
+end
+
+CLI.Handlers["startloot"] = function()
+  LTA.Loot:StartWatch()
+end
+
+CLI.Handlers["stoploot"] = function()
+  LTA.Loot:StopWatch()
+end
+
 function CLI:Handler (msg)
-  LTA:Debug("Processing cli message: " .. msg:len())
+  local handlers = CLI.Handlers
+  LTA:Debug("Processing cli message")
   if msg:len() > 0 then
-    LTA:Info("Process command")
     local cmd = msg:match("[^%s]+")
     local args = msg:sub(cmd:len() + 2)
     LTA:Debug(("Cmd: %s, args: %s"):format(cmd, args))
-    for handlerCmd, handler in pairs(CLI.Handlers) do
-      if cmd == handlerCmd then
-        CLI.Handlers[handlerCmd](args)
-      else
-        LTA:Info("CLI command " .. cmd .. " not found")
-      end
+    if handlers[cmd] then
+      handlers[cmd](args)
+    else
+      LTA:Info("CLI command " .. cmd .. " not found")
     end
   else
-    LTA:Info("Hi from Legal Tender!")
     LTA:Info("CLI commands:")
     for i, _ in pairs(CLI.Handlers) do
       LTA:Info("    " .. i)

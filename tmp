@@ -1,0 +1,5 @@
+function dt(t)
+  for key, value in pairs(t) do
+    print(tostring(key) .. ": " .. tostring(value))
+  end
+end

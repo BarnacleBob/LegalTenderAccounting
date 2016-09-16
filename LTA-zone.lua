@@ -1,21 +1,18 @@
--- Helper functions to watch for zone changes
-LTA:Debug("Initializing Zone Watcher")
-
 LTA.Zone = {}
-
 local Zone = LTA.Zone
 Zone.OnEnters = {}
 Zone.OnExits  = {}
 
 function Zone:OnExit(zone_id, calback)
-  LTA:Debug("registering on exit callback for " .. zone_id)
+  --LTA:Debug("registering on exit callback for " .. zone_id)
   self.OnExits[zone_id] = calback
-  LTA:DumpTable("self.OnExits", self.OnExits)
+  --LTA:DumpTable("self.OnExits", self.OnExits)
 end
+
 function Zone:OnEnter(zone_id, calback)
-  LTA:Debug("registering on exit callback for " .. zone_id)
+  --LTA:Debug("registering on enter callback for " .. zone_id)
   self.OnEnters[zone_id] = calback
-  LTA:DumpTable("self.OnEnters", self.OnEnters)
+  --LTA:DumpTable("self.OnEnters", self.OnEnters)
 end
 
 function Zone:WatchFor(zone_id, enter, exit)
@@ -30,7 +27,7 @@ local watcher = Zone.Watcher
 watcher:RegisterEvent("ZONE_CHANGED")
 watcher:RegisterEvent("ZONE_CHANGED_INDOORS")
 watcher:RegisterEvent("ZONE_CHANGED_NEW_AREA")
---watcher:RegisterEvent("PLAYER_ENTERING_WORLD")
+watcher:SetScript("OnEvent", function(...) Zone:HandleZoneChange(...) end)
 
 function Zone:HandleZoneChange()
   LTA:Debug("Handling Zone Change Event")
@@ -54,9 +51,9 @@ function Zone:HandleZoneChange()
   if self.Current.Id ~= self.Last.Id then
     LTA:Debug("Zone actually changed.  finding handlers")
 
-    LTA:Debug("exits: " .. type(self.OnExits))
-    LTA:DumpTable("self.OnExits", self.OnExits)
-    LTA:DumpTable("self.OnEnters", self.OnEnters)
+    --LTA:Debug("exits: " .. type(self.OnExits))
+    --LTA:DumpTable("self.OnExits", self.OnExits)
+    --LTA:DumpTable("self.OnEnters", self.OnEnters)
     if self.Last.Id and self.OnExits[self.Last.Id] then
       LTA:Debug("Calling exit handler")
       self.OnExits[self.Last.Id](self.Last)
@@ -68,4 +65,28 @@ function Zone:HandleZoneChange()
   end
 end
 
-watcher:SetScript("OnEvent", function(...) Zone:HandleZoneChange(...) end)
+
+Zone.Enter = CreateFrame("Frame")
+Zone.Enter:RegisterEvent("PLAYER_ENTERING_WORLD")
+Zone.Enter:SetScript("OnEvent", function(...) Zone:EnterWorld(...) end)
+
+function Zone:EnterWorld()
+  LTA:Debug("handling enter world event")
+
+  if not self.Current then
+    self.Current={}
+  end
+
+  local x, y, _, map = UnitPosition("player")
+  self.Current.Id = map
+  self.Current.Name = GetRealZoneText(map)
+  SetMapToCurrentZone()
+  self.Current.LocalId = GetCurrentMapAreaID()
+  self.Current.LocalName = GetZoneText()
+  LTA:Debug(("Now in %u (%s) with local %u (%s)"):format(self.Current.Id, self.Current.Name, self.Current.LocalId, self.Current.LocalName))
+
+  if self.OnEnters[self.Current.Id] then
+    LTA:Debug("Calling enter handler")
+    self.OnEnters[self.Current.Id](self.Current)
+  end
+end

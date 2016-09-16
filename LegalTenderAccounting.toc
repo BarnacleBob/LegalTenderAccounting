@@ -7,4 +7,8 @@
 LTA-init.lua
 LTA-cli.lua
 LTA-zone.lua
+LTA-encounter.lua
+LTA-guild.lua
+LTA-group.lua
+LTA-loot.lua
 LTA.lua
