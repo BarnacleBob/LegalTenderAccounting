@@ -20,7 +20,11 @@ CLI.Handlers["guild"] = function()
 end
 
 CLI.Handlers["group"] = function()
-  LTA:DumpTable("Group Members", LTA.Group.Members)
+  LTA:Debug("Group size is " .. LTA.Group.Size)
+  LTA:Debug("group members:")
+  for _,member in pairs(LTA.Group.Members) do
+    LTA:Debug(member.name)
+  end
 end
 
 CLI.Handlers["startloot"] = function()

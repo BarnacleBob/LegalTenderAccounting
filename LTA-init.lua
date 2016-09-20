@@ -3,6 +3,32 @@ print ("Hi from lta-init")
 LTA = {}
 LTA.debug = true
 
+function LTA:HandleInitEvent(event, arg)
+  LTA:Debug("Aaddon loadded event: " .. event .. " " .. arg)
+  if event == "ADDON_LOADED" and arg1 == "LegalTenderAccounting" then
+    if not LTASavedData then
+      LTA:Debug("Initializing sd var")
+      LTASavedData={}
+    end
+    
+    if type(LTASavedData["DataVersion"]) == nil then
+      LTA:Debug("Building data array version 1")
+      LTASavedData.DataVersion=1
+      LTASavedData.EncounterLogs = {}
+      TLASavedData.LastEncounter = nil
+    end
+    
+    LTA:Debug("setting lta.saved data to ltasaveddata")
+    LTA.SavedData = LTASavedData
+  end
+  LTA:Debug("calling main init")
+  LTA:Init()
+end
+
+LTA.InitWatcher = CreateFrame("frame")
+LTA.InitWatcher:RegisterEvent("ADDON_LOADED")
+LTA.InitWatcher:SetScript("OnEvent", function(...) LTA:HandleInitEvent(...) end)
+
 function LTA:Debug(msg)
   if self.debug then
     print("LTA DBG: " .. msg)
@@ -31,7 +57,7 @@ function LTA:CopyTable(orig)
 end
 
 function LTA:DumpTable(name, t)
-  LTA:Debug("dumping table: " .. name)
+  LTA:Debug("dumping table: " .. name .. " " .. tostring(t))
   for key, value in pairs(t) do
     LTA:Debug(tostring(key) .. ": " .. tostring(value))
   end

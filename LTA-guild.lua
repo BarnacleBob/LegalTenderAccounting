@@ -22,7 +22,7 @@ function Guild:GetOnlineMembers()
       member.officernote, member.online, member.status, member.classFileName, 
       member.achievementPoints, member.achievementRank, member.isMobile, member.isSoREligible,
       member.standingID = GetGuildRosterInfo(i);
-    LTA:Debug("Found guild member " .. member.name)
+    --LTA:Debug("Found guild member " .. member.name)
     table.insert(members, member)
   until not member.online
 
