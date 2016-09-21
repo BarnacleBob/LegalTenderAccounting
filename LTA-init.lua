@@ -1,28 +1,42 @@
-print ("Hi from lta-init")
-
 LTA = {}
-LTA.debug = true
 
-function LTA:HandleInitEvent(event, arg)
-  LTA:Debug("Aaddon loadded event: " .. event .. " " .. arg)
-  if event == "ADDON_LOADED" and arg1 == "LegalTenderAccounting" then
-    if not LTASavedData then
-      LTA:Debug("Initializing sd var")
+function LTA:HandleInitEvent(self, event, arg)
+  if event == "ADDON_LOADED" and arg == "LegalTenderAccounting" then
+    LTA:Debug("Aaddon loadded event: " .. event .. " " .. arg)
+    if not LTADataVersion then
+      LTA:Info("Initializing new saved data table")
+      LTADataVersion = 1
+      local dv = LTADataVersion
       LTASavedData={}
+      local sd = LTASavedData
+      
+      sd.Options = {}
+      sd.Options.Debug = false
+      
+      sd.VersionedData = {}
+      sd.VersionedData[dv] = {}
+      local vd = sd.VersionedData[dv]
+      vd.EncounterLogs = {}
+      vd.LastEncounter = nil
     end
+
+    -- here we can migrate a saved data version from one to the next relatively easily
+    -- actually we dont need to migrate local data.  server side can just parse them individually
+    -- just need to save new data versions into a new table
     
-    if type(LTASavedData["DataVersion"]) == nil then
-      LTA:Debug("Building data array version 1")
-      LTASavedData.DataVersion=1
-      LTASavedData.EncounterLogs = {}
-      TLASavedData.LastEncounter = nil
-    end
+    LTA:Debug("data version " .. LTADataVersion)
+    LTA:DumpTable("sd", LTASavedData)
+    LTA:DumpTable("vd", LTASavedData.VersionedData)
+    LTA:DumpTable("data", LTASavedData.VersionedData[LTADataVersion])
     
-    LTA:Debug("setting lta.saved data to ltasaveddata")
-    LTA.SavedData = LTASavedData
+    LTA.SavedData = LTASavedData.VersionedData[LTADataVersion]
+    LTA:Debug("setting lta.options to " .. tostring(LTASavedData.Options))
+    LTA.Options = LTASavedData.Options
+    LTA:Debug("lta.options set to " .. tostring(LTASavedData.Options))
+
+    LTA:Debug("calling main init")
+    LTA:Init()
   end
-  LTA:Debug("calling main init")
-  LTA:Init()
 end
 
 LTA.InitWatcher = CreateFrame("frame")
@@ -30,7 +44,8 @@ LTA.InitWatcher:RegisterEvent("ADDON_LOADED")
 LTA.InitWatcher:SetScript("OnEvent", function(...) LTA:HandleInitEvent(...) end)
 
 function LTA:Debug(msg)
-  if self.debug then
+  -- default to debug unless we have an options array
+  if type(self.Options) or type(self.Options.Debug) == nil or self.Options.Debug then
     print("LTA DBG: " .. msg)
   end
 end
@@ -57,9 +72,10 @@ function LTA:CopyTable(orig)
 end
 
 function LTA:DumpTable(name, t)
-  LTA:Debug("dumping table: " .. name .. " " .. tostring(t))
+  LTA:Debug("dumping table: ")
+  LTA:Debug(name .. " " .. tostring(t))
   for key, value in pairs(t) do
-    LTA:Debug(tostring(key) .. ": " .. tostring(value))
+    LTA:Debug("  " .. tostring(key) .. ": " .. tostring(value))
   end
 end
 

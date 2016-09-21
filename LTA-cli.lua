@@ -6,12 +6,35 @@ SLASH_LTA1 = '/lta';
 CLI.Handlers = {}
 
 CLI.Handlers["debug"] = function (args)
-  if LTA.debug then
+  if LTA.Options.Debug then
     LTA:Info("Disabling debug output")
-    LTA.debug = nil
+    LTA.Options.Debug = nil
   else
     LTA:Info("Enabling debug output")
-    LTA.debug = true
+    LTA.Options.Debug = true
+  end
+end
+
+CLI.Handlers["dv"] = function (arg)
+  if not arg or arg == "" then
+    LTA:Info("Cowardly refusing to dump global scope")
+    return
+  else
+    local sv = _G
+    LTA:Debug("searching global scope for " .. arg)
+    -- lua pattern matching sucks.  end the string with a . so we can get all the parts
+    for v in string.gmatch(arg .. ".", "([^%.]+)%.") do
+      LTA:Debug("searching " .. tostring(sv) .. " for " .. v)
+      if type(sv[v]) == nil then
+        LTA:Debug(v .. " not found")
+        LTA:Info(arg .. " not found")
+      else
+        sv = sv[v]
+      end
+    end
+
+    LTA:Debug("sv is " .. tostring(sv))
+    LTA:DumpTable(arg, sv)
   end
 end
 

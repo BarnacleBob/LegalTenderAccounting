@@ -3,9 +3,12 @@ local Group = LTA.Group
 Group.Members = {}
 Group.MasterLooters = {}
 Group.Watcher = CreateFrame("frame")
-Group.Watcher:RegisterEvent("GROUP_ROSTER_UPDATE")
-Group.Watcher:RegisterEvent("PLAYER_ENTERING_WORLD")
 Group.Watcher:SetScript("OnEvent", function(...) Group:Update(...) end)
+
+function Group:StartWatcher()
+  Group.Watcher:RegisterEvent("GROUP_ROSTER_UPDATE")
+  Group.Watcher:RegisterEvent("PLAYER_ENTERING_WORLD")
+end
 
 function Group:Update(event)
   LTA:Debug("Updating group info")
@@ -13,7 +16,7 @@ function Group:Update(event)
   local members = {}
   local mls = {}
   Group.Size = GetNumGroupMembers()
-  LTA:DumpTable("group", Group)
+  --LTA:DumpTable("group", Group)
   LTA:Debug("group size is: " .. tostring(Group.Size))
   for i=1,Group.Size do
     local member={}
