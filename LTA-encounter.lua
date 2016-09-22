@@ -57,7 +57,7 @@ function Encounter:EventHandler(...)
       
       self.InProgress = true
       
-      LTA:DumpTable("watches", self.Watches)
+      --LTA:DumpTable("watches", self.Watches)
       for _, id in ipairs(BossIds) do
         LTA:Debug("checking if we care about encounter id " .. id)
         if type(self.Watches[id]) ~= nil then

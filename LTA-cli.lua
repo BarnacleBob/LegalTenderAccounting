@@ -15,6 +15,21 @@ CLI.Handlers["debug"] = function (args)
   end
 end
 
+CLI.Handlers["de"] = function(arg)
+  if not arg or arg == "" then
+    LTA:DumpTable("Encounters", LTA.SavedData.EncounterLogs)
+  else
+    LTA:Debug("Looking for encounter " .. arg)
+    if type(LTA.SavedData.EncounterLogs[arg]) == nil then
+      LTA:Debug("Encounter not found")
+    else
+      LTA:Debug(type(LTA.SavedData.EncounterLogs[arg]))
+      LTA:DumpTable(arg, LTA.SavedData.EncounterLogs[arg])
+      LTA.LEDBG = LTA.SavedData.EncounterLogs[arg]
+    end
+  end
+end
+
 CLI.Handlers["dv"] = function (arg)
   if not arg or arg == "" then
     LTA:Info("Cowardly refusing to dump global scope")
@@ -25,6 +40,10 @@ CLI.Handlers["dv"] = function (arg)
     -- lua pattern matching sucks.  end the string with a . so we can get all the parts
     for v in string.gmatch(arg .. ".", "([^%.]+)%.") do
       LTA:Debug("searching " .. tostring(sv) .. " for " .. v)
+      if string.match(v, "^[%d]+$") then
+        LTA:Debug("looks like a straight numeric index")
+        v = tonumber(v)
+      end
       if type(sv[v]) == nil then
         LTA:Debug(v .. " not found")
         LTA:Info(arg .. " not found")

@@ -34,6 +34,7 @@ function LTA:Init()
   end
 
   local function ZCStart()
+    LTA:Info("LegalTenderAccounting now watching for encounters")
     LTA.Encounter:StartWatch()
     LTA.Loot:StartWatch()
   end
@@ -42,6 +43,7 @@ function LTA:Init()
     LTA.Encounter:StopWatch()
     LTA.Group:StopWatch()
     LTA.Loot:StopWatch()
+    LTA:Info("LegalTenderAccounting done watching for encounters")
   end
 
   for zone, encounters in pairs(em) do
@@ -84,12 +86,13 @@ function LTA:EncounterStarted (mobId)
   encounter.Key = ("%s %s %u"):format(encounter.RaidDate, encounter.StartTime, encounter.Id)
 
   LTA:Info("Logging encounter " .. encounter.Key) 
-  local sd = LTASavedData
+  local sd = LTA.SavedData
   sd.EncounterLogs[encounter.Key] = encounter
   LTA:DumpTable("sd", sd)
   LTA:DumpTable("el", sd.EncounterLogs)
   LTA:DumpTable("el log", sd.EncounterLogs[encounter.Key])
   
-  sd.LastEncounter = sd.EncounterLogs[encounter.Key]
-  LTA:DumpTable("Last encounter", sd.LastEncounter)
+  sd.LastEncounter = encounter.Key
+  LTA:Debug("Last encounter" .. sd.LastEncounter)
+  LTA.LEDBG = sd.EncounterLogs[encounter.Key]
 end

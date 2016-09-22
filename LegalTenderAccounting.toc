@@ -1,8 +1,10 @@
 ## Interface: 70000
 ## X-Min-Interface: 70000
 ## Title:Legal Tender Accounting
+## Notes: "Addon to track raid attendance and loot"
 ## Author: Huumi aka BarnacleBob
 ## X-Website: http://lta.legaltender.net
+## SavedVariables: LTADataVersion, LTASavedData
 
 LTA-init.lua
 LTA-cli.lua

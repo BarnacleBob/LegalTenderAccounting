@@ -1,12 +1,9 @@
-LTA:Debug("init loot shit")
 LTA.Loot={}
 local Loot=LTA.Loot
 Loot.Looters = {}
 
 Loot.Watcher = CreateFrame("Frame")
 Loot.Watcher:SetScript("OnEvent", function(...) Loot.HandleMsg(...) end)
-
-LTA:Debug("Done loot init")
 
 function Loot:StartWatch()
   LTA:Debug("Starting Loot watcher")
@@ -30,13 +27,17 @@ end
 function Loot:HandleMsg(event, ...)
   LTA:DumpVarArgs("HandleLootMsg", ...)
   -- ("message", "sender", "language", "channelString", "target", "flags", unknown, channelNumber, "channelName", unknown, counter)
-  local sd = LTASavedData
-  LTA:DumpTable("Last encounter", sd.LastEncounter)
-    
-  if type(LTA.LastEncounter) == nil then
+  local sd = LTA.SavedData
+  LTA:Debug("Last Encounter: " .. sd.LastEncounter)
+  
+  if type(sd.LastEncounter) == nil then
     LTA:Debug("We have no last enounter to log this item to")
     return nil
   end
+
+  local LastEncounter = sd.EncounterLogs[sd.LastEncounter]
+  LTA:DumpTable("Last encounter", LastEncounter)
+
   local lm = {}
   local msg, sender, lang, channelString, target, flags, uk1, channelNumber, channelName, uk2, counter = ...
   lm.msg = msg
@@ -68,20 +69,9 @@ function Loot:HandleMsg(event, ...)
   lm.item = item
   LTA:DumpTable("Item", item)
   
-  -- Looks like item ids are stored in some magic unicode string to make a linked item.
-  -- gonna process server side the entire set of messages
-  --LTA:Debug("msg type:" .. type(msg))
-  --LTA:Debug("found spaces: " .. string.find(msg, "%s"))
-  --for i=1, string.len(msg) do
-  --  LTA:Debug(msg:byte(i) .. ": " .. string.char(msg:byte(i)))
-  --end
-  --for word in string.gmatch(msg, "%S+") do
-  --  LTA.Debug(word)
-  --end
-  
   LTA:DumpTable("lm", lm)
-  if LTA.LastEncounter ~= nil then
+  if LastEncounter ~= nil then
     LTA:Debug("inserting loot event into last encounter")
-    table.insert(LTA.LastEncounter.Loot, lm)
+    table.insert(LastEncounter.Loot, lm)
   end
 end
